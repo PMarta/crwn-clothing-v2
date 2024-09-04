@@ -1,18 +1,70 @@
 import { onAuthStateChanged } from "firebase/auth";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useReducer } from "react";
 import { onAuthStateChangedListener, createUserDocumentFromAuth } from "../utils/firebase/firebase.utils";
-
+import { createAction } from "../utils/reducer/reducer.utils";
+//--->useContext
 //actual value you want to access
+// export const UserContext = createContext({
+//     currentUser: null,
+//     setCurrentUser: () => null
+// });
+//functional Component that I ll use it
+// export const UserProvider = ({children}) => {
+//     const [currentUser, setCurrentUser] = useState(null);
+//     const value = {currentUser, setCurrentUser};
+
+
+//     //obervatorul meu pt userul sing in/sign out
+//     useEffect(() => {
+//         const unsubscribe = onAuthStateChangedListener((user)=>{
+//             if(user){
+//                 createUserDocumentFromAuth(user);
+//             }
+//            setCurrentUser(user);
+//         });
+
+//         return unsubscribe;
+//     },[]);
+
+//     return <UserContext.Provider value={value}>{children}</UserContext.Provider>
+// }
+
+//--->useReducer
 export const UserContext = createContext({
     currentUser: null,
     setCurrentUser: () => null
 });
 
-//functional Component that I ll use it
-export const UserProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState(null);
-    const value = {currentUser, setCurrentUser};
+export const USER_ACTION_TYPES = {
+    SET_CURRENT_USER: 'SET_CURRENT_USER',
+};
 
+const userReducer = (state, action) => {
+    debugger
+    console.log('dispatched')
+    console.log('action:', action)
+    const {type, payload} = action;//payload este valoarea
+    switch(type){
+        case USER_ACTION_TYPES.SET_CURRENT_USER:
+            return {
+                ...state,
+                currentUser: payload
+            }
+        default:
+            throw new Error(`Unhandled type ${type} in userReducer`);
+    }
+}
+const INITIAL_STATE={
+    currentUser: null
+}
+export const UserProvider = ({children}) => {
+    const [{currentUser}, dispatch] = useReducer(userReducer, INITIAL_STATE);//state,dispatch
+    console.log('current user:',currentUser)
+    const setCurrentUser = (user) => {
+        dispatch(createAction(USER_ACTION_TYPES.SET_CURRENT_USER,user));
+    }
+
+    const value = {currentUser, setCurrentUser};
     //obervatorul meu pt userul sing in/sign out
     useEffect(() => {
         const unsubscribe = onAuthStateChangedListener((user)=>{
