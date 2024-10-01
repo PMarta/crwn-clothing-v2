@@ -1,23 +1,23 @@
-import Button from '../button/button.component';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
+import { selectCartItems } from '../../store/cart/cart.selector';
+import Button from '../button/button.component';
 import CartItem from '../cart-item/cart-item.component';
 
-import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CartContext } from '../../context/cart.context';
 import {
   CartDropDownContainer,
   EmptyMessage,
   CartItems,
-} from "./cart-dropdown.style";
+} from './cart-dropdown.styles';
 
 const CartDropdown = () => {
-    const {cartItems} = useContext(CartContext);
-    const navigate = useNavigate();
-    const goToCheckoutHandler = () => {
-       navigate('/checkout');
-    }
+  const cartItems = useSelector(selectCartItems);
+  const navigate = useNavigate();
 
+  const goToCheckoutHandler = () => {
+    navigate('/checkout');
+  };
 
   return (
     <CartDropDownContainer>
@@ -31,6 +31,6 @@ const CartDropdown = () => {
       <Button onClick={goToCheckoutHandler}>GO TO CHECKOUT</Button>
     </CartDropDownContainer>
   );
-}
+};
 
-export default CartDropdown
+export default CartDropdown;
