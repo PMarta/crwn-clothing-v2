@@ -2,6 +2,7 @@ import { compose, createStore, applyMiddleware } from "redux";
 import logger from "redux-logger"; //sau pot face import la middleware ul meu
 import { persistStore,  persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import { thunk } from "redux-thunk";
 
 import rootReducer from "./root-reducer";
 //logger->allows us to see what the state looks like
@@ -9,15 +10,16 @@ import rootReducer from "./root-reducer";
 // and then how the state looks after the action
 
 //middlewares->it s kind of library helpers that run before an action hits the reducer: dispatch action->middleware->reducer
-const middleWares = [process.env.NODE_ENV === 'development' && logger].filter(Boolean);//in production nu mi se va rula logger ul
 // console.log('compose', compose)
 // console.log('middleWares:',...middleWares)
 const persistConfig = {
     key: 'root',
     storage,
-    blacklist: ['user'],//ce nu vreau sa stochez in localStorage->date despre user
+    whitelist: ['cart']//singurul data store pe care vreau sa l salvez in localStorage 
 };
 const persistedReducer = persistReducer(persistConfig, rootReducer);
+const middleWares = [process.env.NODE_ENV === 'development' && logger, thunk].filter(Boolean);//in production nu mi se va rula logger ul
+
 //config pentru devtools redux chrome extension
 const composeEnhancer =
   (process.env.NODE_ENV !== "production" &&
